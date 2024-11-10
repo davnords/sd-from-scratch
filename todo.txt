@@ -1,0 +1,9 @@
+* Add torch.compiles
+* Add torchrun for multiple GPUs
+* Run on cluster
+* Add Wandb
+* Add CLIP 
+* Add attention to Unet
+* Add learning rate scheduler
+* Save checkpoints
+* Create web ui
