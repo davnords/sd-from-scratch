@@ -1,7 +1,7 @@
 # T = 300
 IMG_SIZE = 64
-BATCH_SIZE = 128 # same as DDPM
-GRADIENT_ACCUMULATION = 1
+BATCH_SIZE = 32 # same as DDPM (if accounted for gradient accumulation)
+GRADIENT_ACCUMULATION = 4
 LR = 2e-4
 
 # DDPM trains 800k steps -> 800 -> c. 3413 epochs of Celeb data

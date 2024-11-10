@@ -120,7 +120,7 @@ def sample_timestep(x, t, model):
         return model_mean + torch.sqrt(posterior_variance_t) * noise 
 
 @torch.no_grad()
-def sample_plot_image(model, device='cuda:0', name='sample.png'):
+def sample_plot_image(model, device='cuda:0', name='sample.png', return_image=False):
     # Sample noise
     img_size = IMG_SIZE
     img = torch.randn((1, 3, img_size, img_size), device=device)
@@ -137,21 +137,25 @@ def sample_plot_image(model, device='cuda:0', name='sample.png'):
         if i % stepsize == 0:
             plt.subplot(1, num_images, int(i/stepsize)+1)
             show_tensor_image(img.detach().cpu())
-    plt.savefig('plots/'+name)            
+    plt.savefig('plots/'+name)   
+    if return_image:
+        return img         
 
 
-def clip_embed_image():
+def clip_embed_image(image):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, preprocess = clip.load("ViT-B/32", device=device)
-
-    image = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
-    text = clip.tokenize(["a diagram", "a dog", "a cat"]).to(device)
+    image = preprocess(image).unsqueeze(0).to(device)
 
     with torch.no_grad():
         image_features = model.encode_image(image)
-        text_features = model.encode_text(text)
-        
-        logits_per_image, logits_per_text = model(image, text)
-        probs = logits_per_image.softmax(dim=-1).cpu().numpy()
+        return image_features
 
-    print("Label probs:", probs)  # prints: [[0.9927937  0.00421068 0.00299572]]
+def clip_embed_text(text):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-B/32", device=device)
+    text = clip.tokenize(text).to(device)
+
+    with torch.no_grad():
+        text_features = model.encode_text(text)
+        return text_features

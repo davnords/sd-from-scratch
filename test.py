@@ -1,6 +1,6 @@
 import torch.nn.functional as F
 from utils import forward_diffusion_sample, sample_plot_image
-from unet import SimpleUnet
+from model import Unet
 import torch
 from dataset import CelebaDataset
 from config import IMG_SIZE, BATCH_SIZE, T, GRADIENT_ACCUMULATION, LR
@@ -8,6 +8,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import time
+
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 torch.set_float32_matmul_precision('high')  # Enable high precision for float32 matmul operations
@@ -31,9 +32,14 @@ def get_dataset():
     return train_dataloader, None
 
 def train():
-    model = SimpleUnet().to(device=device)
+    model = Unet(
+        dim=64,
+        dim_mults=(1, 2, 4, 8),
+        flash_attn=False,
+    ).to(device=device)
+
     print('Number of parameters: ', sum(p.numel() for p in model.parameters()))
-    model = torch.compile(model)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
     epochs = 5000
 
@@ -55,7 +61,7 @@ def train():
             print(f"\nEpoch {epoch + 1} achieves a loss of: ",loss.item())
             sample_plot_image(model, device=device, name=f"sample_{epoch}.png")
         if epoch%100 == 0:
-            torch.save(model.state_dict(), f"checkpoints/model_{epoch}.pt")
+            torch.save(model, f"checkpoints/model_{epoch}.pt")
 
 if __name__=="__main__":
     train()

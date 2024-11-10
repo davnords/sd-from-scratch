@@ -6,7 +6,11 @@
 
 ## Inspiration
 - https://www.youtube.com/watch?v=a4Yfz2FxXiY&t=900s
+- https://github.com/hkproj/pytorch-stable-diffusion
     
 ## Papers referenced:
 - https://github.com/openai/CLIP
 - DDPM 
+
+## Get started
+`flask --app webserver run`
